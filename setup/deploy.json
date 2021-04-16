@@ -22,7 +22,7 @@
     },
     "InstallCloudLabsShadow": {
       "type": "string",
-      "defaultValue": "yes",
+      "defaultValue": "no",
       "allowedValues": [
         "yes",
         "no"
@@ -147,12 +147,12 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "",
+                "https://raw.githubusercontent.com/srushti-714/IOT-Hack/main/setup/psscript.ps1",
                 "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1"
               ]
             },
             "protectedSettings": {
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File synapse-inaday-demo/fraud-detection/scripts/psscript.ps1', variables('cloudlabsCommon'))]"
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File psscript.ps1', variables('cloudlabsCommon'))]"
             }
           }
         }
