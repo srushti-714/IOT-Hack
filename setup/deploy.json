@@ -8,42 +8,22 @@
     "adminPassword": {
       "type": "SecureString"
     },
-    "AzureUserName": {
+    "deploymentID": {
       "type": "string"
-    },
-    "AzurePassword": {
-      "type": "securestring"
-    },
-    "ODLID": {
-      "type": "string"
-    },
-    "DeploymentID": {
-      "type": "string"
-    },
-    "InstallCloudLabsShadow": {
-      "type": "string",
-      "defaultValue": "no",
-      "allowedValues": [
-        "yes",
-        "no"
-      ]
     }
   },
   "variables": {
-    "cloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'),' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'))]",
-    "AzureSubscriptionID": "[subscription().subscriptionId]",
-    "AzureTenantID": "[subscription().tenantId]",
-    "rgName": "[resourceGroup().name]",
+
     "addressPrefix": "10.0.0.0/16",
-    "networkInterfaceName": "labvm-nic",
-    "networkSecurityGroupName": "labvm-nsg",
-    "publicIpAddressDNSName": "[concat('labvm-', uniqueString(resourceGroup().id))]",
-    "publicIpAddressName": "[concat('labvm-pip', uniqueString(resourceGroup().id))]",
+    "networkInterfaceName": "[concat(variables('vmName'), '-nic')]",
+    "networkSecurityGroupName": "[concat(variables('vmName'), '-nsg')]",
+    "publicIpAddressDNSName": "[concat('labvm', uniqueString(resourceGroup().id))]",
+    "publicIpAddressName": "[concat(variables('vmName'), '-pip')]",
     "subnetName": "Subnet",
     "subnetPrefix": "10.0.0.0/24",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/',variables('virtualNetworkName'), variables('subnetName'))]",
-    "virtualMachineSize": "Standard_D2s_v3",
-    "virtualNetworkName": "labvm-vnet",
+    "virtualMachineSize": "Standard_D4s_v3",
+    "virtualNetworkName": "labvNet",
     "vmName": "[concat('PowerBI-',parameters('DeploymentID'))]",
     "location": "[resourceGroup().location]"
   },
@@ -69,6 +49,7 @@
         ]
       }
     },
+    
     {
       "type": "Microsoft.Network/publicIpAddresses",
       "apiVersion": "2017-08-01",
@@ -115,9 +96,7 @@
               "storageAccountType": "Premium_LRS"
             }
           },
-          "dataDisks": [
-
-          ]
+          "dataDisks": []
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -126,37 +105,7 @@
             }
           ]
         }
-      },
-      "resources": [
-        {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('vmName'),'/', 'winExtension')]",
-          "apiVersion": "2015-06-15",
-          "location": "[resourceGroup().location]",
-          "comments": "Script",
-          "tags": {
-            "displayName": "VM Extension"
-          },
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Compute",
-            "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.8",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "https://raw.githubusercontent.com/srushti-714/IOT-Hack/main/setup/psscript.ps1",
-                "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1"
-              ]
-            },
-            "protectedSettings": {
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File psscript.ps1', variables('cloudlabsCommon'))]"
-            }
-          }
-        }
-      ]
+      }
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -178,7 +127,37 @@
               "destinationPortRange": "3389"
             }
           }
+
         ]
+      }
+    },
+    
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('vmName'),'/', 'winExtension')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "comments": "Script",
+      "tags": {
+        "displayName": "VM Extension"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.8",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/srushti-714/IOT-Hack/main/setup/psscript.ps1",
+            "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1"
+          ]
+        },
+        "protectedSettings": {
+          "commandToExecute": "powershell -ExecutionPolicy Bypass -File psscript.ps1"
+        }
       }
     },
     {
@@ -224,7 +203,6 @@
     "LABVM DNS Name": {
       "type": "String",
       "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]"
-    },
-    
+    }
   }
 }
