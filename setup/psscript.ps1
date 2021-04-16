@@ -1,41 +1,21 @@
-Param (
-    [Parameter(Mandatory = $true)]
-    [string]
-    $AzureUserName,
-
-    [string]
-    $AzurePassword,
-
-    [string]
-    $AzureTenantID,
-
-    [string]
-    $AzureSubscriptionID,
-
-    [string]
-    $ODLID,
-    
-    [string]
-    $DeploymentID,
-
-    [string]
-    $InstallCloudLabsShadow
-)
-
 Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsCustomScriptExtension.txt -Append
 [Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls" 
+ 
 
 #Import Common Functions
-$path = pwd
-$path=$path.Path
-$commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
-. $commonscriptpath
+#. cloudlabs-common\cloudlabs-windows-functions.ps1
+$path = pwd 
+$ImportCommonFunctions = $path.Path + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
+. $ImportCommonFunctions
 
-# Run Imported functions from cloudlabs-windows-functions.ps1
+
+#Run Common Functions
 WindowsServerCommon
-InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
-CreateCredFile $AzureUserName $AzurePassword $AzureTenantID $AzureSubscriptionID $DeploymentID $ODLID
+InstallEdgeChromium
+DisableServerMgrNetworkPopup
+Disable-InternetExplorerESC
+Enable-IEFileDownload
 
 
 #Download and Install IoT simulator
