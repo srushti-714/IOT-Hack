@@ -35,7 +35,7 @@ Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type
 
 # Scheduled Task
 $Trigger= New-ScheduledTaskTrigger -AtLogOn
-$User= "$($env:ComputerName)\demouser" 
+$User= "$($env:ComputerName)\hackuser" 
 $Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File $Directory\logontask.ps1"
 Register-ScheduledTask -TaskName "setup" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
 
