@@ -22,7 +22,7 @@
     "subnetName": "Subnet",
     "subnetPrefix": "10.0.0.0/24",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/',variables('virtualNetworkName'), variables('subnetName'))]",
-    "virtualMachineSize": "Standard_D4s_v3",
+    "virtualMachineSize": "Standard_Ds2_v2",
     "virtualNetworkName": "labvNet",
     "vmName": "[concat('labvm-',parameters('DeploymentID'))]",
     "location": "[resourceGroup().location]"
